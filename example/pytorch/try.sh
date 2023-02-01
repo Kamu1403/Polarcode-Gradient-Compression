@@ -1,0 +1,29 @@
+DMLC_NUM_WORKER=4 DMLC_ROLE=scheduler DMLC_NUM_SERVER=1 DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=1234 bpslaunch &
+DMLC_NUM_WORKER=4 DMLC_ROLE=server DMLC_NUM_SERVER=1 DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=1234 bpslaunch &
+
+CUDA_VISIBLE_DEVICES=4 NVIDIA_VISIBLE_DEVICES=0 DMLC_WORKER_ID=0 \
+DMLC_NUM_WORKER=4 DMLC_ROLE=worker DMLC_NUM_SERVER=1 DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=1234 BYTEPS_VISIBLE_CPU_CORES=0-6,28-34 \
+bpslaunch python3 /root/github/gradient-compression/byteps/example/pytorch/train_mnist_byteps.py --epochs 3 &
+
+CUDA_VISIBLE_DEVICES=5 NVIDIA_VISIBLE_DEVICES=0 DMLC_WORKER_ID=1 \
+DMLC_NUM_WORKER=4 DMLC_ROLE=worker DMLC_NUM_SERVER=1 DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=1234 BYTEPS_VISIBLE_CPU_CORES=7-13,35-41 \
+bpslaunch python3 /root/github/gradient-compression/byteps/example/pytorch/train_mnist_byteps.py --epochs 3 &
+
+CUDA_VISIBLE_DEVICES=6 NVIDIA_VISIBLE_DEVICES=0 DMLC_WORKER_ID=2 \
+DMLC_NUM_WORKER=4 DMLC_ROLE=worker DMLC_NUM_SERVER=1 DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=1234 BYTEPS_VISIBLE_CPU_CORES=14-20,42-48 \
+bpslaunch python3 /root/github/gradient-compression/byteps/example/pytorch/train_mnist_byteps.py --epochs 3 &
+
+CUDA_VISIBLE_DEVICES=7 NVIDIA_VISIBLE_DEVICES=0 DMLC_WORKER_ID=3 \
+DMLC_NUM_WORKER=4 DMLC_ROLE=worker DMLC_NUM_SERVER=1 DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=1234 BYTEPS_VISIBLE_CPU_CORES=21-27,49-55 \
+bpslaunch python3 /root/github/gradient-compression/byteps/example/pytorch/train_mnist_byteps.py --epochs 3 &
+
+
+CUDA_VISIBLE_DEVICES=4,5,6,7 NVIDIA_VISIBLE_DEVICES=0,1,2,3 DMLC_WORKER_ID=0 DMLC_NUM_WORKER=1 DMLC_ROLE=worker bpslaunch python3 /root/github/gradient-compression/byteps/example/pytorch/train_mnist_byteps.py
+
+CUDA_VISIBLE_DEVICES=4,5,6,7 NVIDIA_VISIBLE_DEVICES=0,1,2,3 DMLC_WORKER_ID=0 DMLC_NUM_WORKER=1 DMLC_ROLE=worker bpslaunch python3 /root/github/gradient-compression/byteps/example/pytorch/mnist-distributed.py
+
+DMLC_NUM_WORKER=1 DMLC_ROLE=scheduler DMLC_NUM_SERVER=1 DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=1234 BYTEPS_FORCE_DISTRIBUTED=1 bpslaunch &
+DMLC_NUM_WORKER=1 DMLC_ROLE=server DMLC_NUM_SERVER=1 DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=1234 BYTEPS_FORCE_DISTRIBUTED=1 bpslaunch &
+CUDA_VISIBLE_DEVICES=4,5,6,7 NVIDIA_VISIBLE_DEVICES=0,1,2,3 DMLC_WORKER_ID=0 \
+DMLC_NUM_WORKER=1 DMLC_ROLE=worker DMLC_NUM_SERVER=1 DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=1234 BYTEPS_FORCE_DISTRIBUTED=1 \
+bpslaunch python3 /root/github/gradient-compression/byteps/example/pytorch/train_mnist_byteps.py --epochs 3 --fp16-pushpull &

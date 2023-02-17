@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 import matplotlib.pyplot as plt
-from Compressor import PolarCompress, PolarCompressExtend
+from Compressor import PolarCompress, PolarCompressExtend, PolarCompressSplit
 import torch
 
 
@@ -38,10 +38,52 @@ import torch
 #     print("The decoded message is:", myPC.get_codeword())
 #     print("Precision:", np.count_nonzero(my_message == myPC.get_codeword()) / my_message.shape[0])
 #     print("Diffs:", np.where(my_message != myPC.get_codeword()))
+def loglog_distribution(x: np.ndarray, a, b):
+    pdf = (b / a * ((x / a) ** (b - 1))) / ((1 + (x / a) ** b) ** 2)
+    cdf = (x ** b) / (a ** b + x ** b)
+    return pdf, cdf
+
+
+def draw_pdf(dis_list):
+    ran_list = np.asarray(dis_list)
+    count = np.bincount(ran_list) / ran_list.shape[0]
+    cdf = np.cumsum(count)
+    ran_range = np.arange(ran_list.max() + 1)
+    loglog_pdf, loglog_cdf = loglog_distribution(ran_range, 300, 0.7)
+    print(np.bincount(ran_list))
+
+    plt.figure()
+    plt.plot(ran_range, count, label="PDF")
+    plt.plot(ran_range, cdf, label="CDF")
+    plt.ylim(0, 1.1)
+    plt.xlabel("X")
+    plt.ylabel("Probability Values")
+    plt.title("CDF for discrete distribution")
+    plt.legend()
+
+    plt.figure()
+    plt.plot(ran_range, count, label="Noise")
+    plt.plot(ran_range, loglog_pdf, label="loglog")
+    plt.ylim(0, 0.1)
+    plt.xlabel("X")
+    plt.ylabel("Probability Values")
+    plt.title("PDF")
+    plt.legend()
+
+    plt.figure()
+    plt.plot(ran_range, cdf, label="Noise")
+    plt.plot(ran_range, loglog_cdf, label="loglog")
+    plt.ylim(0, 1.1)
+    plt.xlabel("X")
+    plt.ylabel("Probability Values")
+    plt.title("CDF")
+    plt.legend()
+
+    plt.show()
 
 
 def main():
-    choose = 0
+    choose = 2
 
     # x = np.arange(0.25, 1, 0.01)
     # y = binary_entropy(x)
@@ -49,15 +91,34 @@ def main():
     # plt.show()
 
     if choose == 0:
-        message = (torch.randn(4 * 4 * 4)*64).type(torch.int8).reshape(4, 4, 4)
+        message = (torch.randn(4 * 4 * 4 * 4) * 64 * 64).type(torch.int16).reshape(4, 4, 4, 4)
         # print(message)
         package = PolarCompressExtend.compress(message)
         print('package:', package)
         dec_message = PolarCompressExtend.decompress(*package)
         # print(dec_message)
         diff = message - dec_message
+        draw_pdf(diff.type(dtype=torch.int64).abs().reshape(4 * 4 * 4 * 4))
         print('diff:', diff)
-        print('avg diff:', diff.abs().type(dtype=torch.float).mean())
+        print('avg diff:', diff.type(dtype=torch.int64).abs().type(dtype=torch.float).mean())
+        print('rmse diff:',
+              torch.nn.MSELoss()(message.type(dtype=torch.float), dec_message.type(dtype=torch.float)) ** 0.5)
+
+
+    elif choose == 2:
+        message = (torch.randn(4 * 4 * 4 * 4) * 64 * 64).type(torch.int16).reshape(4, 4, 4, 4)
+        # print(message)
+        package = PolarCompressSplit.compress(message)
+        print('package:', package)
+        dec_message = PolarCompressSplit.decompress(*package)
+        # print(dec_message)
+        diff = message - dec_message
+        draw_pdf(diff.type(dtype=torch.int64).abs().reshape(4 * 4 * 4 * 4))
+        print('diff:', diff)
+        print('avg diff:', diff.type(dtype=torch.int64).abs().type(dtype=torch.float).mean())
+        print('rmse diff:',
+              torch.nn.MSELoss()(message.type(dtype=torch.float), dec_message.type(dtype=torch.float)) ** 0.5)
+
 
     elif choose == 1:
         rate = [float(_) / 10 for _ in range(1, 10, 2)]

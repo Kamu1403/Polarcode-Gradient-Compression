@@ -6,7 +6,7 @@ A polar decoder class. Currently only Successive Cancellation Decoder (SCD) is s
 
 import numpy as np
 from polarcodes.utils import *
-from SC_Encode import SCD
+from polar_compression.SC_Encode import SCD
 
 
 class Compress:

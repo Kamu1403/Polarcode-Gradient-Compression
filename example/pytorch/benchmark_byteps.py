@@ -60,7 +60,7 @@ if args.cuda:
 optimizer = optim.SGD(model.parameters(), lr=0.01)
 
 # BytePS: (optional) compression algorithm.
-compression = bps.Compression.fp16 if args.fp16_pushpull else bps.Compression.none
+compression = bps.Compression.polar if args.fp16_pushpull else bps.Compression.none
 
 # BytePS: wrap optimizer with DistributedOptimizer.
 optimizer = bps.DistributedOptimizer(optimizer,

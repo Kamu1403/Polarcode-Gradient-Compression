@@ -16,7 +16,7 @@
 """Gradient compression algorithms."""
 
 import torch
-from polar_compression import PolarCompressExtend
+from polar_compression import PolarCompressFinal
 
 
 class Compressor(object):
@@ -130,11 +130,11 @@ class PolarCompressor(Compressor):
 
     @staticmethod
     def compress(tensor):
-        return PolarCompressExtend.compress(tensor)
+        return PolarCompressFinal.compress(tensor)
 
     @staticmethod
     def decompress(tensor, ctx):
-        return PolarCompressExtend.decompress(tensor, ctx)
+        return PolarCompressFinal.decompress(tensor, ctx)
 
 
 class Compression(object):

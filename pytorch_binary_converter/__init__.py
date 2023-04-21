@@ -1,4 +1,6 @@
-from binary_converter import float2bit, bit2float
+import torch
+
+from .binary_converter import float2bit, bit2float
 
 
 class FloatConverter:
@@ -26,9 +28,9 @@ class FloatConverter:
     @staticmethod
     def to_binary(tensor, bits):
         conf = FloatConverter.config[bits]
-        float2bit(tensor, num_e_bits=conf['exp'], num_m_bits=conf['mant'], bias=conf['bias'])
+        return float2bit(tensor, num_e_bits=conf['exp'], num_m_bits=conf['mant'], bias=conf['bias']).type(torch.int32)
 
     @staticmethod
     def to_float(tensor, bits):
         conf = FloatConverter.config[bits]
-        bit2float(tensor, num_e_bits=conf['exp'], num_m_bits=conf['mant'], bias=conf['bias'])
+        return bit2float(tensor, num_e_bits=conf['exp'], num_m_bits=conf['mant'], bias=conf['bias'])
